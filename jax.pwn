@@ -6,6 +6,7 @@
 
 #define TEAM_CIV 1
 #define TEAM_MEDIC 2
+#define TEAM_COP 3
 
 new PlayerDead = 0;
 new gTeam[MAX_PLAYERS];
@@ -42,7 +43,9 @@ public OnGameModeInit()
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("Jax's County RP");
 	AddStaticVehicle(579,1381.4486,456.8737,19.8448,66.8997,86,0); // car spawn mont
-	AddStaticVehicle(416,1228.8513,300.8872,19.5583,65.4873,1,3);
+	AddStaticVehicle(416,1228.8513,300.8872,19.5583,65.4873,1,3); // Ambulance
+	AddStaticVehicle(599,621.8810,-605.5264,17.0863,93.5474,0,1); // cop car spawn
+	AddStaticVehicle(523,623.6823,-600.5562,16.9626,271.7641,0,1); // cop bike spawn
     DisableInteriorEnterExits();
     
 	return 1;
@@ -129,6 +132,13 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	    SendClientMessage(playerid, -1, "You are now a Medic!");
 	    return 1;
 	}
+	if (strcmp("/cop", cmdtext, true, 4) == 0)
+	{
+	    gTeam[playerid] = TEAM_COP;
+	    SetPlayerSkin(playerid, 283);
+	    SendClientMessage(playerid, -1, "You are now a Police Officer!");
+	    return 1;
+	}
 	if (strcmp("/civ", cmdtext, true, 4) == 0)
 	{
 	    if (gTeam[playerid] == TEAM_CIV)
@@ -160,6 +170,40 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 			else
 			{
 				SendClientMessage(playerid,0xFF0000FF,"You are not a Medic!");
+				RemovePlayerFromVehicle(playerid);
+				TogglePlayerControllable(playerid,1);
+				return 1;
+			}
+		}
+	}
+    if (vehicleid == 3)
+	{
+	    if (ispassenger == 0)
+	    {
+	        if (gTeam[playerid] == TEAM_COP)
+	        {
+	            return 1;
+			}
+			else
+			{
+				SendClientMessage(playerid,0xFF0000FF,"You are not a Police Officer!");
+				RemovePlayerFromVehicle(playerid);
+				TogglePlayerControllable(playerid,1);
+				return 1;
+			}
+		}
+	}
+	if (vehicleid == 4)
+	{
+	    if (ispassenger == 0)
+	    {
+	        if (gTeam[playerid] == TEAM_COP)
+	        {
+	            return 1;
+			}
+			else
+			{
+				SendClientMessage(playerid,0xFF0000FF,"You are not a Police Officer!");
 				RemovePlayerFromVehicle(playerid);
 				TogglePlayerControllable(playerid,1);
 				return 1;

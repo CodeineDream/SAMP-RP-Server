@@ -4,7 +4,11 @@
 
 #include <a_samp>
 
+#define TEAM_CIV 1
+#define TEAM_MEDIC 2
+
 new PlayerDead = 0;
+new gTeam[MAX_PLAYERS];
 
 
 #if defined FILTERSCRIPT
@@ -37,7 +41,8 @@ public OnGameModeInit()
 {
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("Jax's County RP");
-	AddStaticVehicle(579,1381.4486,456.8737,19.8448,66.8997,0,0); // car spawn mont
+	AddStaticVehicle(579,1381.4486,456.8737,19.8448,66.8997,86,0); // car spawn mont
+	AddStaticVehicle(416,1228.8513,300.8872,19.5583,65.4873,1,3);
     DisableInteriorEnterExits();
     
 	return 1;
@@ -68,6 +73,8 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
+    SetPlayerSkin(playerid, 101);
+    gTeam[playerid] = TEAM_CIV;
 	SendClientMessage(playerid, 0x00FF00FF, "Hello");
 	if (PlayerDead == 1)
 	{
@@ -104,16 +111,61 @@ public OnPlayerText(playerid, text[])
 
 public OnPlayerCommandText(playerid, cmdtext[])
 {
-	if (strcmp("/kill", cmdtext, true, 10) == 0)
+	if (strcmp("/kill", cmdtext, true, 5) == 0)
 	{
 	    SetPlayerHealth(0,0);
 		return 1;
+	}
+	
+	if (strcmp("/setskin",cmdtext, true, 8) == 0)
+	{
+	    SetPlayerSkin(playerid, 101);
+	    return 1;
+	}
+	if (strcmp("/medic", cmdtext, true, 6) == 0)
+	{
+	    gTeam[playerid] = TEAM_MEDIC;
+	    SetPlayerSkin(playerid, 276);
+	    SendClientMessage(playerid, -1, "You are now a Medic!");
+	    return 1;
+	}
+	if (strcmp("/civ", cmdtext, true, 4) == 0)
+	{
+	    if (gTeam[playerid] == TEAM_CIV)
+	    {
+	        SendClientMessage(playerid, 0xFF0000FF, "You are already a Civilian!");
+	        return 1;
+     	}
+     	else
+     	{
+     	    gTeam[playerid] = TEAM_CIV;
+     	    SetPlayerSkin(playerid, 101);
+     	    SendClientMessage(playerid, -1, "You are now Unemployed!");
+     	    return 1;
+		}
 	}
 	return 0;
 }
 
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
+	if (vehicleid == 2)
+	{
+	    if (ispassenger == 0)
+	    {
+	        if (gTeam[playerid] == TEAM_MEDIC)
+	        {
+	            return 1;
+			}
+			else
+			{
+				SendClientMessage(playerid,0xFF0000FF,"You are not a Medic!");
+				RemovePlayerFromVehicle(playerid);
+				TogglePlayerControllable(playerid,1);
+				return 1;
+			}
+		}
+	}
 	return 1;
 }
 

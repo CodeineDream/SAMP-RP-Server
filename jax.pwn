@@ -4,7 +4,8 @@
 
 #include <a_samp>
 
-new PlayerDead[MAX_PLAYERS];
+new PlayerDead = 0;
+
 
 #if defined FILTERSCRIPT
 
@@ -36,9 +37,9 @@ public OnGameModeInit()
 {
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("Jax's County RP");
-	AddPlayerClass(0,1382.7467,464.5195,20.2091,145.6167,0,0,0,0,0,0); // player spawn
 	AddStaticVehicle(579,1381.4486,456.8737,19.8448,66.8997,0,0); // car spawn mont
     DisableInteriorEnterExits();
+    
 	return 1;
 }
 
@@ -67,14 +68,22 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	
-	
+	SendClientMessage(playerid, 0x00FF00FF, "Hello");
+	if (PlayerDead == 1)
+	{
+		SetPlayerPos(playerid, 1241.3473,327.6176,19.7555);
+		PlayerDead = 0;
+	}
+	else
+	{
+	    SetPlayerPos(playerid, 1382.7467,464.5195,20.2091);
+	}
 	return 1;
 }
 
 public OnPlayerDeath(playerid, killerid, reason)
 {
-    
+	PlayerDead = 1;
 	return 1;
 }
 
@@ -97,8 +106,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 {
 	if (strcmp("/kill", cmdtext, true, 10) == 0)
 	{
-		SetPlayerHealth(0,0);
-		PlayerDead[playerid] = 1;
+	    SetPlayerHealth(0,0);
 		return 1;
 	}
 	return 0;
